@@ -1,763 +1,910 @@
 Perfeito! Vamos organizar o README completo em 5 partes para facilitar a leitura e navegação. Aqui está o README dividido:
 
-# README: Gerenciador de Tarefas Full-Stack
+README: Gerenciador de Tarefas Full-Stack
 
 Este projeto é um gerenciador de tarefas full-stack construído com React para o frontend e Node.js com Express para o backend, utilizando um banco de dados MySQL.
 
-## Parte 1: Visão Geral e Estrutura do Projeto
-
-### Visão Geral
+Parte 1: Visão Geral e Estrutura do Projeto
+Visão Geral
 
 O objetivo deste projeto é fornecer uma aplicação completa para gerenciamento de tarefas, permitindo que usuários criem, listem, editem, marquem como concluídas e excluam tarefas. O projeto inclui autenticação de usuário e um sistema de segurança via JWT (JSON Web Tokens).
 
-### Estrutura do Projeto
+Estrutura do Projeto
 
 O projeto está dividido em duas partes principais:
 
-*   **`backend/`**: Contém o código do servidor (API REST).
-*   **`task-manager-frontend/`**: Contém o código da aplicação cliente (interface de usuário).
+backend/: Contém o código do servidor (API REST).
 
-## Parte 2: Backend (Node.js com Express)
+task-manager-frontend/: Contém o código da aplicação cliente (interface de usuário).
 
-### Descrição
+Parte 2: Backend (Node.js com Express)
+Descrição
 
 O backend é responsável por gerenciar a lógica de negócios, armazenar os dados, processar as requisições e retornar as respostas para o frontend.
 
-### Tecnologias
+Tecnologias
 
-*   **Node.js:** Ambiente de execução JavaScript do lado do servidor.
-*   **Express:** Framework web para Node.js para criar APIs REST.
-*   **MySQL:** Sistema de gerenciamento de banco de dados relacional.
-*   **Sequelize:** ORM (Object-Relational Mapping) para interagir com o banco de dados.
-*   **Bcrypt:** Biblioteca para hash de senhas.
-*   **jsonwebtoken:** Biblioteca para geração e verificação de JWTs.
-*   **cors:** Middleware para permitir acesso a API para diferentes origens.
-*   **dotenv:** Biblioteca para leitura das variáveis de ambiente do arquivo `.env`.
+Node.js: Ambiente de execução JavaScript do lado do servidor.
 
-### Estrutura de Pastas
+Express: Framework web para Node.js para criar APIs REST.
 
-*   **`backend/index.js`**: Ponto de entrada da aplicação.
-    ```javascript
-    require('dotenv').config();
+MySQL: Sistema de gerenciamento de banco de dados relacional.
 
-    const express = require('express');
-    const cors = require('cors');
-    const bodyParser = require('body-parser');
-    const { sequelize } = require('./database/models');
-    const authRoutes = require('./database/routes/auth');
-    const taskRoutes = require('./database/routes/task');
-    const errorHandler = require('./middlewares/errorHandler');
-    const app = express();
-    const PORT = process.env.PORT || 3001;
+Sequelize: ORM (Object-Relational Mapping) para interagir com o banco de dados.
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+Bcrypt: Biblioteca para hash de senhas.
 
-    app.use(cors({
-    origin: 'http://localhost:3000',
-    }));
-   
-    app.use('/api/auth', authRoutes);
-    app.use('/api/tasks', taskRoutes);
+jsonwebtoken: Biblioteca para geração e verificação de JWTs.
 
-    app.use(errorHandler);
+cors: Middleware para permitir acesso a API para diferentes origens.
 
-    app.get('/', (req, res) => {
-      res.send('Servidor está funcionando!');
-    });
+dotenv: Biblioteca para leitura das variáveis de ambiente do arquivo .env.
 
-    sequelize.authenticate()
+Estrutura de Pastas
+
+backend/index.js: Ponto de entrada da aplicação.
+
+require('dotenv').config();
+
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const { sequelize } = require('./database/models');
+const authRoutes = require('./database/routes/auth');
+const taskRoutes = require('./database/routes/task');
+const errorHandler = require('./middlewares/errorHandler');
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors({
+origin: 'http://localhost:3000',
+}));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
+
+app.use(errorHandler);
+
+app.get('/', (req, res) => {
+  res.send('Servidor está funcionando!');
+});
+
+sequelize.authenticate()
+  .then(() => {
+    console.log('Conexão com o banco de dados estabelecida com sucesso.');
+    sequelize.sync({ force: false })
       .then(() => {
-        console.log('Conexão com o banco de dados estabelecida com sucesso.');
-        sequelize.sync({ force: false })
-          .then(() => {
-            console.log('Banco de dados sincronizado.');
-            app.listen(PORT, () => {
-              console.log(`Servidor iniciado na porta ${PORT}`);
-            });
-          })
-          .catch(error => {
-            console.error('Erro ao sincronizar o banco de dados:', error);
-          });
+        console.log('Banco de dados sincronizado.');
+        app.listen(PORT, () => {
+          console.log(`Servidor iniciado na porta ${PORT}`);
+        });
       })
       .catch(error => {
-        console.error('Erro ao conectar ao banco de dados:', error);
+        console.error('Erro ao sincronizar o banco de dados:', error);
       });
-    ```
-    *   Inicia o servidor Express, configura os middlewares, e as rotas da aplicação.
-*   **`backend/controllers/`**: Contém a lógica de negócios da aplicação:
-    *   **`authController.js`**: Responsável pela autenticação e cadastro de usuários.
-        *   **`signup`**:
-            ```javascript
-            exports.signup = async (req, res) => {
-                try {
-                    const { email, password } = req.body;
+  })
+  .catch(error => {
+    console.error('Erro ao conectar ao banco de dados:', error);
+  });
+content_copy
+download
+Use code with caution.
+JavaScript
 
-                    const emailExists = await checkIfEmailExists(email);
-                    if (emailExists) {
-                    return res.status(400).json({ message: 'Email já cadastrado.' });
-                    }
+Inicia o servidor Express, configura os middlewares, e as rotas da aplicação.
 
-                    const hashedPassword = await bcrypt.hash(password, 10);
+backend/controllers/: Contém a lógica de negócios da aplicação:
 
-                    const newUser = await User.create({ email, password: hashedPassword });
+authController.js: Responsável pela autenticação e cadastro de usuários.
 
-                    const token = jwt.sign({ id: newUser.id }, JWT_SECRET, { expiresIn: '1h' });
+signup:
 
-                    res.status(201).json({ message: 'Cadastro realizado com sucesso.', token });
-                } catch (error) {
-                    console.error('Erro ao cadastrar usuário:', error);
-                    res.status(500).json({ message: 'Erro ao cadastrar usuário.', error: error.message });
-                }
-            };
-            ```
-            *  Verifica se o e-mail já existe, criptografa a senha, cria o usuário e gera um token JWT.
-        *   **`login`**:
-             ```javascript
-             exports.login = async (req, res) => {
-                try {
-                    const { email, password } = req.body;
-            
-                    const user = await User.findOne({ where: { email } });
-                    if (!user) {
-                    return res.status(404).json({ message: 'Usuário não encontrado.' });
-                    }
-            
-                    const isMatch = await bcrypt.compare(password, user.password);
-                    if (!isMatch) {
-                    return res.status(400).json({ message: 'Senha incorreta.' });
-                    }
-            
-                    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
-            
-                    res.status(200).json({ message: 'Login bem-sucedido.', token });
-                } catch (error) {
-                    console.error('Erro ao fazer login:', error);
-                    res.status(500).json({ message: 'Erro ao fazer login.', error: error.message });
-                }
-             };
-             ```
-            *  Verifica se o usuário existe, compara a senha, gera o token JWT para o usuário logado.
-    *   **`taskController.js`**: Responsável pela manipulação das tarefas.
-        *   **`addTask`**: Adiciona uma nova tarefa, validando o título e descrição.
-        *   **`listTasks`**: Lista todas as tarefas do usuário, com opções de filtro por título, status e id do usuário.
-        *   **`updateTask`**: Atualiza uma tarefa existente, verificando a existência da mesma e validando o título e a descrição.
-        *   **`completeTask`**: Altera o status de conclusão da tarefa.
-        *   **`deleteTask`**: Exclui uma tarefa.
+exports.signup = async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-## Parte 3: Banco de Dados (MySQL com Sequelize)
+        const emailExists = await checkIfEmailExists(email);
+        if (emailExists) {
+        return res.status(400).json({ message: 'Email já cadastrado.' });
+        }
 
-### Descrição
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await User.create({ email, password: hashedPassword });
+
+        const token = jwt.sign({ id: newUser.id }, JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({ message: 'Cadastro realizado com sucesso.', token });
+    } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error);
+        res.status(500).json({ message: 'Erro ao cadastrar usuário.', error: error.message });
+    }
+};
+content_copy
+download
+Use code with caution.
+JavaScript
+
+Verifica se o e-mail já existe, criptografa a senha, cria o usuário e gera um token JWT.
+
+login:
+
+exports.login = async (req, res) => {
+   try {
+       const { email, password } = req.body;
+
+       const user = await User.findOne({ where: { email } });
+       if (!user) {
+       return res.status(404).json({ message: 'Usuário não encontrado.' });
+       }
+
+       const isMatch = await bcrypt.compare(password, user.password);
+       if (!isMatch) {
+       return res.status(400).json({ message: 'Senha incorreta.' });
+       }
+
+       const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+
+       res.status(200).json({ message: 'Login bem-sucedido.', token });
+   } catch (error) {
+       console.error('Erro ao fazer login:', error);
+       res.status(500).json({ message: 'Erro ao fazer login.', error: error.message });
+   }
+};
+content_copy
+download
+Use code with caution.
+JavaScript
+
+Verifica se o usuário existe, compara a senha, gera o token JWT para o usuário logado.
+
+taskController.js: Responsável pela manipulação das tarefas.
+
+addTask: Adiciona uma nova tarefa, validando o título e descrição.
+
+listTasks: Lista todas as tarefas do usuário, com opções de filtro por título, status e id do usuário.
+
+updateTask: Atualiza uma tarefa existente, verificando a existência da mesma e validando o título e a descrição.
+
+completeTask: Altera o status de conclusão da tarefa.
+
+deleteTask: Exclui uma tarefa.
+
+Parte 3: Banco de Dados (MySQL com Sequelize)
+Descrição
 
 O banco de dados MySQL é usado para persistir os dados da aplicação, como usuários e suas tarefas. O Sequelize é utilizado como ORM para facilitar a interação com o banco de dados.
 
-### Estrutura de Pastas
+Estrutura de Pastas
 
-*   **`backend/database/`**: Configuração do banco de dados:
-    *   **`config/config.js`**: Configurações de conexão com o banco de dados (MySQL) para diferentes ambientes (desenvolvimento e produção).
-    ```javascript
-    require('dotenv').config();
+backend/database/: Configuração do banco de dados:
 
-    module.exports = {
-      development: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        host: process.env.DB_HOST,
-        dialect: 'mysql',
-        logging: false
-      },
-      production: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        host: process.env.DB_HOST,
-        dialect: 'mysql',
-        logging: false
-      }
-    };
-    ```
-    *   **`migrations/`**: Migrations para criação e alterações de tabelas do banco de dados.
-    ```javascript
-      // migrations/xxxx-create-user.js
-      module.exports = {
-        async up(queryInterface, Sequelize) {
-          await queryInterface.createTable('Users', {
-            id: {
-              allowNull: false,
-              autoIncrement: true,
-              primaryKey: true,
-              type: Sequelize.INTEGER,
-            },
-            username: {
-              type: Sequelize.STRING,
-              allowNull: false,
-            },
-            email: {
-              type: Sequelize.STRING,
-              allowNull: false,
-              unique: true,
-            },
-            password: {
-              type: Sequelize.STRING,
-              allowNull: false,
-            },
-            createdAt: {
-              allowNull: false,
-              type: Sequelize.DATE,
-            },
-            updatedAt: {
-              allowNull: false,
-              type: Sequelize.DATE,
-            },
-          });
+config/config.js: Configurações de conexão com o banco de dados (MySQL) para diferentes ambientes (desenvolvimento e produção).
+
+require('dotenv').config();
+
+module.exports = {
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: 'mysql',
+    logging: false
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: 'mysql',
+    logging: false
+  }
+};
+content_copy
+download
+Use code with caution.
+JavaScript
+
+migrations/: Migrations para criação e alterações de tabelas do banco de dados.
+
+// migrations/xxxx-create-user.js
+  module.exports = {
+    async up(queryInterface, Sequelize) {
+      await queryInterface.createTable('Users', {
+        id: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER,
         },
-        async down(queryInterface, Sequelize) {
-          await queryInterface.dropTable('Users');
+        username: {
+          type: Sequelize.STRING,
+          allowNull: false,
         },
-      };
-    ```
-     *    Esta migration cria a tabela `Users` com os campos `id`, `username`, `email`, `password`
-        *   **`models/`**: Definição dos models do Sequelize para as tabelas:
-            *   **`index.js`**: Carrega todos os models e configura o Sequelize.
-             ```javascript
-            const fs = require('fs');
-            const path = require('path');
-            const Sequelize = require('sequelize');
+        email: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          unique: true,
+        },
+        password: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      });
+    },
+    async down(queryInterface, Sequelize) {
+      await queryInterface.dropTable('Users');
+    },
+  };
+content_copy
+download
+Use code with caution.
+JavaScript
 
-            const setupDatabase = (config) => {
-              const sequelize = new Sequelize(config.database, config.username, config.password, {
-                  host: config.host,
-                  dialect: 'mysql',
-                  logging: false
-              });
+Esta migration cria a tabela Users com os campos id, username, email, password
+* models/: Definição dos models do Sequelize para as tabelas:
 
-            const db = {};
+index.js: Carrega todos os models e configura o Sequelize.
 
-            fs.readdirSync(__dirname)
-                .filter(file => (file.indexOf('.') !== 0) && (file !== 'index.js'))
-                .forEach(file => {
-                const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-                db[model.name] = model;
-                });
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
 
-            Object.keys(db).forEach(modelName => {
-                if (db[modelName].associate) {
-                    db[modelName].associate(db);
-                }
-            });
+const setupDatabase = (config) => {
+ const sequelize = new Sequelize(config.database, config.username, config.password, {
+     host: config.host,
+     dialect: 'mysql',
+     logging: false
+ });
 
-            db.sequelize = sequelize;
-            db.Sequelize = Sequelize;
-            
-              return db;
-            };
+const db = {};
 
-            const config = process.env.NODE_ENV === 'test'
-            ? {
-                username: process.env.DB_USER || 'test',
-                password: process.env.DB_PASSWORD || 'test',
-                database: process.env.DB_NAME || 'test',
-                host: process.env.DB_HOST || 'test'
-                } : 
-            {
-                username: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
-                host: process.env.DB_HOST
-            };
+fs.readdirSync(__dirname)
+   .filter(file => (file.indexOf('.') !== 0) && (file !== 'index.js'))
+   .forEach(file => {
+   const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+   db[model.name] = model;
+   });
 
-            const db = setupDatabase(config);
+Object.keys(db).forEach(modelName => {
+   if (db[modelName].associate) {
+       db[modelName].associate(db);
+   }
+});
 
-            module.exports = db;
-            ```
-            *   Esta parte do código configura o sequelize e carrega os models
-            *   **`task.js`**: Define o model da tabela de tasks.
-              ```javascript
-                 module.exports = (sequelize, DataTypes) => {
-                   const Task = sequelize.define('Task', {
-                     title: {
-                       type: DataTypes.STRING,
-                       allowNull: false,
-                     },
-                     description: {
-                       type: DataTypes.TEXT,
-                       allowNull: false,
-                     },
-                     completed: {
-                       type: DataTypes.BOOLEAN,
-                       defaultValue: false,
-                     },
-                     dueDate: {
-                       type: DataTypes.DATE,
-                       allowNull: true,
-                     },
-                     userId: {
-                       type: DataTypes.INTEGER,
-                       allowNull: false,
-                     },
-                   });
-                 
-                   return Task;
-                 };
-              ```
-              *   Este model define a estrutura da tabela `Task` com os campos `title`, `description`, `completed`, `dueDate` e `userId`.
-            *   **`user.js`**: Define o model da tabela de usuários.
-            ```javascript
-            module.exports = (sequelize, DataTypes) => {
-              const User = sequelize.define('User', {
-                email: {
-                  type: DataTypes.STRING,
-                  allowNull: false,
-                  unique: true,
-                },
-                password: {
-                  type: DataTypes.STRING,
-                  allowNull: false,
-                },
-              });
-              return User;
-             };
-            ```
-            *  Este model define a estrutura da tabela `Users` com os campos `email`, e `password`.
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-## Parte 4: Frontend (React)
+ return db;
+};
 
-### Descrição
+const config = process.env.NODE_ENV === 'test'
+? {
+   username: process.env.DB_USER || 'test',
+   password: process.env.DB_PASSWORD || 'test',
+   database: process.env.DB_NAME || 'test',
+   host: process.env.DB_HOST || 'test'
+   } : 
+{
+   username: process.env.DB_USER,
+   password: process.env.DB_PASSWORD,
+   database: process.env.DB_NAME,
+   host: process.env.DB_HOST
+};
+
+const db = setupDatabase(config);
+
+module.exports = db;
+content_copy
+download
+Use code with caution.
+JavaScript
+
+Esta parte do código configura o sequelize e carrega os models
+
+task.js: Define o model da tabela de tasks.
+```javascript
+module.exports = (sequelize, DataTypes) => {
+const Task = sequelize.define('Task', {
+title: {
+type: DataTypes.STRING,
+allowNull: false,
+},
+description: {
+type: DataTypes.TEXT,
+allowNull: false,
+},
+completed: {
+type: DataTypes.BOOLEAN,
+defaultValue: false,
+},
+dueDate: {
+type: DataTypes.DATE,
+allowNull: true,
+},
+userId: {
+type: DataTypes.INTEGER,
+allowNull: false,
+},
+});
+
+return Task;
+};
+```
+* Este model define a estrutura da tabela Task com os campos `title`, `description`, `completed`, `dueDate` e `userId`.
+
+user.js: Define o model da tabela de usuários.
+
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
+  return User;
+ };
+content_copy
+download
+Use code with caution.
+JavaScript
+
+Este model define a estrutura da tabela Users com os campos email, e password.
+
+Parte 4: Frontend (React)
+Descrição
 
 O frontend é a interface com a qual o usuário interage, permitindo a criação, listagem e gerenciamento de tarefas.
 
-### Tecnologias
+Tecnologias
 
-*   **React:** Biblioteca JavaScript para criar interfaces de usuário.
-*   **React Router:** Biblioteca para navegação entre páginas.
-*   **Axios:** Biblioteca para fazer requisições HTTP ao backend.
-*   **TypeScript:** Superset de JavaScript que adiciona tipagem estática.
+React: Biblioteca JavaScript para criar interfaces de usuário.
 
-### Estrutura de Pastas
-*   **`task-manager-frontend/src/index.tsx`**: Ponto de entrada da aplicação, onde configura o contexto, roteador e o componente principal `App`.
-    ```typescript
-    import React from 'react';
-    import ReactDOM from 'react-dom/client';
-    import './index.css';
-    import App from './App';
-    import AuthProvider from './context/AuthProvider';
-    import { BrowserRouter } from 'react-router-dom';
-    
-    const rootElement = document.getElementById('root');
-      if (rootElement) {
-          const root = ReactDOM.createRoot(rootElement);
-          root.render(
-             <React.StrictMode>
-                 <BrowserRouter>
-                     <AuthProvider>
-                         <App />
-                     </AuthProvider>
-                 </BrowserRouter>
-             </React.StrictMode>
-          );
-     }
-    ```
-    *  Renderiza o componente principal do App, que está envolvido pelo roteador e o contexto de autenticação.
-*   **`task-manager-frontend/src/App.tsx`**:  Componente principal, responsável pelo roteamento e autenticação.
-    ```typescript
-    import React from 'react';
-    import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-    import LoginPage from './pages/LoginPage';
-    import RegisterPage from './pages/RegisterPage';
-    import HomePage from './pages/HomePage';
-    import { useAuth } from './hooks/useAuth';
-    
-    
-    const App: React.FC = () => {
-      const { isAuthenticated } = useAuth();
-      return (
-          <Routes>
-          <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/"/>}/>
-              <Route path="/register" element={!isAuthenticated ? <RegisterPage />: <Navigate to="/"/> } />
-              <Route path="/" element={ isAuthenticated ? <HomePage /> : <Navigate to="/login"/>}/>
-          </Routes>
+React Router: Biblioteca para navegação entre páginas.
+
+Axios: Biblioteca para fazer requisições HTTP ao backend.
+
+TypeScript: Superset de JavaScript que adiciona tipagem estática.
+
+Estrutura de Pastas
+
+task-manager-frontend/src/index.tsx: Ponto de entrada da aplicação, onde configura o contexto, roteador e o componente principal App.
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import AuthProvider from './context/AuthProvider';
+import { BrowserRouter } from 'react-router-dom';
+
+const rootElement = document.getElementById('root');
+  if (rootElement) {
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+         <React.StrictMode>
+             <BrowserRouter>
+                 <AuthProvider>
+                     <App />
+                 </AuthProvider>
+             </BrowserRouter>
+         </React.StrictMode>
       );
+ }
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Renderiza o componente principal do App, que está envolvido pelo roteador e o contexto de autenticação.
+
+task-manager-frontend/src/App.tsx: Componente principal, responsável pelo roteamento e autenticação.
+
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import HomePage from './pages/HomePage';
+import { useAuth } from './hooks/useAuth';
+
+
+const App: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  return (
+      <Routes>
+      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/"/>}/>
+          <Route path="/register" element={!isAuthenticated ? <RegisterPage />: <Navigate to="/"/> } />
+          <Route path="/" element={ isAuthenticated ? <HomePage /> : <Navigate to="/login"/>}/>
+      </Routes>
+  );
+};
+
+export default App;
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Utiliza o BrowserRouter para definir as rotas da aplicação.
+
+Utiliza o useAuth hook para verificar a autenticação e definir as rotas.
+
+task-manager-frontend/src/components/: Contém todos os componentes da aplicação:
+
+auth/: Componentes relacionados à autenticação:
+
+Login.tsx: Componente para o formulário de login.
+
+import React, { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await login(email, password);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="password">Senha:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <button type="submit">Entrar</button>
+    </form>
+  );
+};
+
+export default Login;
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Utiliza o hook useState para gerenciar os inputs, e o hook useAuth para fazer a requisição de login.
+
+Signup.tsx: Componente para o formulário de cadastro.
+
+import React, { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+
+const Signup: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { signup } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await signup(email, password);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+        <h2>Cadastro</h2>
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="password">Senha:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <button type="submit">Cadastrar</button>
+    </form>
+  );
+};
+
+export default Signup;
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Utiliza o hook useState para gerenciar os inputs, e o hook useAuth para fazer a requisição de cadastro.
+
+layout/: Componentes relacionados ao layout da aplicação:
+
+Layout.tsx: Componente para estruturar as páginas.
+
+Navbar.tsx: Componente da barra de navegação.
+
+import React from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { Link } from 'react-router-dom';
+
+const Navbar: React.FC = () => {
+    const {logout, isAuthenticated } = useAuth()
+    return (
+        <nav>
+            <ul>
+                { isAuthenticated ? (
+                    <>
+                        <li><button onClick={logout}>Sair</button></li>
+                    </>
+                ) : (
+                <>
+                    <li><Link to="/login">Login</Link></li>
+                    <li><Link to="/register">Cadastrar</Link></li>
+                </>
+                )}
+            </ul>
+        </nav>
+    )
+}
+
+export default Navbar;
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Renderiza a barra de navegação com as opções de Login e Cadastro quando não logado, e o botão de sair quando logado.
+
+tasks/: Componentes relacionados a tarefas:
+
+FilterTasks.tsx: Componente para filtrar as tarefas por título, status e userId.
+
+import React from 'react';
+
+interface FilterTasksProps {
+    onFilter: (title: string, completed: string, userId: string) => void;
+}
+
+const FilterTasks: React.FC<FilterTasksProps> = ({onFilter}) => {
+  const handleFilter = (e: React.FormEvent) => {
+    e.preventDefault();
+    const title = (e.target as HTMLFormElement).querySelector<HTMLInputElement>('input[type="text"]')?.value || '';
+    const completed = (e.target as HTMLFormElement).querySelector<HTMLSelectElement>('select')?.value || '';
+    const userId = (e.target as HTMLFormElement).querySelector<HTMLInputElement>('input[placeholder="Filtrar por usuário"]')?.value || '';
+    onFilter(title, completed, userId);
+  }
+  return (
+     <form onSubmit={handleFilter}>
+       <h2>Filtrar Tarefas</h2>
+       <input type="text" placeholder="Filtrar por título" />
+       <select>
+           <option value="">Todos</option>
+           <option value="true">Concluídas</option>
+           <option value="false">Pendente</option>
+       </select>
+       <input type="text" placeholder="Filtrar por usuário" />
+       <button>Filtrar</button>
+     </form>
+   );
+};
+
+export default FilterTasks;
+export {};
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Renderiza um formulário para que o usuário possa filtrar as tarefas através dos inputs do formulário.
+
+TaskForm.tsx: Componente para formulário de adição e edição de tarefas.
+
+import React, { useState } from 'react';
+
+interface TaskFormProps {
+    onSubmit: (task: { title: string; description: string; dueDate: string }) => void;
+    initialTask?: { title: string; description: string; dueDate: string };
+}
+
+const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialTask }) => {
+    const [title, setTitle] = useState(initialTask?.title || '');
+    const [description, setDescription] = useState(initialTask?.description || '');
+    const [dueDate, setDueDate] = useState(initialTask?.dueDate || '');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit({ title, description, dueDate });
+        setTitle('');
+        setDescription('');
+        setDueDate('');
     };
-    
-    export default App;
-    ```
-    *  Utiliza o `BrowserRouter` para definir as rotas da aplicação.
-    *  Utiliza o `useAuth` hook para verificar a autenticação e definir as rotas.
-*   **`task-manager-frontend/src/components/`**: Contém todos os componentes da aplicação:
-    *   **`auth/`**: Componentes relacionados à autenticação:
-        *   **`Login.tsx`**: Componente para o formulário de login.
-            ```typescript
-            import React, { useState } from 'react';
-            import { useAuth } from '../../hooks/useAuth';
-            
-            const Login: React.FC = () => {
-              const [email, setEmail] = useState('');
-              const [password, setPassword] = useState('');
-              const { login } = useAuth();
-            
-              const handleSubmit = async (event: React.FormEvent) => {
-                event.preventDefault();
-                await login(email, password);
-              };
-            
-              return (
-                <form onSubmit={handleSubmit}>
-                  <h2>Login</h2>
-                  <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="password">Senha:</label>
-                    <input
-                      type="password"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <button type="submit">Entrar</button>
-                </form>
-              );
-            };
-            
-            export default Login;
-            ```
-            *    Utiliza o hook `useState` para gerenciar os inputs, e o hook `useAuth` para fazer a requisição de login.
-        *   **`Signup.tsx`**: Componente para o formulário de cadastro.
-            ```typescript
-            import React, { useState } from 'react';
-            import { useAuth } from '../../hooks/useAuth';
-            
-            const Signup: React.FC = () => {
-              const [email, setEmail] = useState('');
-              const [password, setPassword] = useState('');
-              const { signup } = useAuth();
-            
-              const handleSubmit = async (event: React.FormEvent) => {
-                event.preventDefault();
-                await signup(email, password);
-              };
-            
-              return (
-                <form onSubmit={handleSubmit}>
-                    <h2>Cadastro</h2>
-                  <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="password">Senha:</label>
-                    <input
-                      type="password"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <button type="submit">Cadastrar</button>
-                </form>
-              );
-            };
-            
-            export default Signup;
-            ```
-            *  Utiliza o hook `useState` para gerenciar os inputs, e o hook `useAuth` para fazer a requisição de cadastro.
-    *   **`layout/`**: Componentes relacionados ao layout da aplicação:
-        *   **`Layout.tsx`**: Componente para estruturar as páginas.
-        *   **`Navbar.tsx`**: Componente da barra de navegação.
-            ```typescript
-            import React from 'react';
-            import { useAuth } from '../../hooks/useAuth';
-            import { Link } from 'react-router-dom';
-            
-            const Navbar: React.FC = () => {
-                const {logout, isAuthenticated } = useAuth()
-                return (
-                    <nav>
-                        <ul>
-                            { isAuthenticated ? (
-                                <>
-                                    <li><button onClick={logout}>Sair</button></li>
-                                </>
-                            ) : (
-                            <>
-                                <li><Link to="/login">Login</Link></li>
-                                <li><Link to="/register">Cadastrar</Link></li>
-                            </>
-                            )}
-                        </ul>
-                    </nav>
-                )
-            }
-            
-            export default Navbar;
-            ```
-            * Renderiza a barra de navegação com as opções de Login e Cadastro quando não logado, e o botão de sair quando logado.
-    *   **`tasks/`**: Componentes relacionados a tarefas:
-        *   **`FilterTasks.tsx`**: Componente para filtrar as tarefas por título, status e userId.
-            ```typescript
-            import React from 'react';
-            
-            interface FilterTasksProps {
-                onFilter: (title: string, completed: string, userId: string) => void;
-            }
-            
-            const FilterTasks: React.FC<FilterTasksProps> = ({onFilter}) => {
-              const handleFilter = (e: React.FormEvent) => {
-                e.preventDefault();
-                const title = (e.target as HTMLFormElement).querySelector<HTMLInputElement>('input[type="text"]')?.value || '';
-                const completed = (e.target as HTMLFormElement).querySelector<HTMLSelectElement>('select')?.value || '';
-                const userId = (e.target as HTMLFormElement).querySelector<HTMLInputElement>('input[placeholder="Filtrar por usuário"]')?.value || '';
-                onFilter(title, completed, userId);
-              }
-              return (
-                 <form onSubmit={handleFilter}>
-                   <h2>Filtrar Tarefas</h2>
-                   <input type="text" placeholder="Filtrar por título" />
-                   <select>
-                       <option value="">Todos</option>
-                       <option value="true">Concluídas</option>
-                       <option value="false">Pendente</option>
-                   </select>
-                   <input type="text" placeholder="Filtrar por usuário" />
-                   <button>Filtrar</button>
-                 </form>
-               );
-            };
-            
-            export default FilterTasks;
-            export {};
-            ```
-            *   Renderiza um formulário para que o usuário possa filtrar as tarefas através dos inputs do formulário.
-        *   **`TaskForm.tsx`**: Componente para formulário de adição e edição de tarefas.
-            ```typescript
-            import React, { useState } from 'react';
-            
-            interface TaskFormProps {
-                onSubmit: (task: { title: string; description: string; dueDate: string }) => void;
-                initialTask?: { title: string; description: string; dueDate: string };
-            }
-            
-            const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialTask }) => {
-                const [title, setTitle] = useState(initialTask?.title || '');
-                const [description, setDescription] = useState(initialTask?.description || '');
-                const [dueDate, setDueDate] = useState(initialTask?.dueDate || '');
-                const handleSubmit = (e: React.FormEvent) => {
-                    e.preventDefault();
-                    onSubmit({ title, description, dueDate });
-                    setTitle('');
-                    setDescription('');
-                    setDueDate('');
-                };
-            
-                return (
-                    <form onSubmit={handleSubmit}>
-                        <h2>{initialTask ? 'Editar Tarefa' : 'Adicionar Tarefa'}</h2>
-                        <div>
-                            <label htmlFor="title">Título</label>
-                            <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                        </div>
-                        <div>
-                            <label htmlFor="description">Descrição</label>
-                            <textarea
-                                id="description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="dueDate">Data de Vencimento</label>
-                            <input
-                                type="datetime-local"
-                                id="dueDate"
-                                value={dueDate}
-                                onChange={(e) => setDueDate(e.target.value)}
-                            />
-                        </div>
-                        <button type="submit">{initialTask ? 'Editar' : 'Adicionar'}</button>
-                    </form>
-                );
-            };
-            
-            export default TaskForm;
-            export {};
-            ```
-            *  Renderiza o formulário para adicionar e editar tarefas, utilizando `useState` para o gerenciamento dos estados dos inputs e `initialTask` caso a função seja editar.
-        *   **`TaskItem.tsx`**: Componente para renderizar um item individual de tarefa.
-            ```typescript
-            import React from 'react';
-            
-            interface TaskItemProps {
-                id: number;
-                title: string;
-                description: string;
-                completed: boolean;
-                dueDate: string | null;
-                onEdit: (id: number) => void;
-                onDelete: (id: number) => void;
-                onComplete: (id: number) => void;
-            }
-            
-            const TaskItem: React.FC<TaskItemProps> = ({
-                id,
-                title,
-                description,
-                completed,
-                dueDate,
-                onEdit,
-                onDelete,
-                onComplete,
-            }) => {
-                const handleComplete = () => {
-                    onComplete(id);
-                };
-                const handleDelete = () => {
-                    onDelete(id);
-                };
-                const handleEdit = () => {
-                    onEdit(id);
-                };
-                return (
-                    <li>
-                        <h2>{title}</h2>
-                        <p>{description}</p>
-                        {dueDate ? (
-                            <p>
-                                Data de Vencimento: {new Date(dueDate).toLocaleDateString()} {new Date(dueDate).toLocaleTimeString()}
-                            </p>
-                        ) : null}
-                        <div>
-                            <button onClick={handleEdit}>Editar</button>
-                            <button onClick={handleDelete}>Excluir</button>
-                            <button style={{ backgroundColor: completed ? 'green' : 'gray' }} onClick={handleComplete}>
-                                {completed ? 'Concluído' : 'Pendente'}
-                            </button>
-                        </div>
-                    </li>
-                );
-            };
-            
-            export default TaskItem;
-            export {};
-            ```
-             * Exibe os detalhes de uma tarefa, incluindo botões para editar, excluir e completar.
-        *   **`TaskList.tsx`**: Componente para renderizar a lista de tarefas.
-            ```typescript
-            import React from 'react';
-            
-            interface Task {
-              id: number;
-              title: string;
-              description: string;
-              completed: boolean;
-              dueDate: string | null;
-            }
-            
-            interface TaskListProps {
-              tasks: Task[];
-              onEdit: (id: number) => void;
-              onDelete: (id: number) => void;
-              onComplete: (id: number) => void;
-            }
-            
-            const TaskList: React.FC<TaskListProps> = ({ tasks, onEdit, onDelete, onComplete }) => {
-              return (
-                <div className="task-list-container">
-                  {tasks.map((task) => (
-                    <div className="task-item" key={task.id}>
-                      <h3>{task.title}</h3>
-                      <p>{task.description}</p>
-                      <p>Vence em: {task.dueDate || 'Sem data'}</p>
-                      <button onClick={() => onEdit(task.id)}>Editar</button>
-                      <button onClick={() => onDelete(task.id)}>Excluir</button>
-                    </div>
-                  ))}
-                </div>
-              );
-            };
-            
-            export default TaskList;
-            ```
-             *   Renderiza uma lista de tarefas usando o método `map`.
 
-## Parte 5: Configuração, Execução e Testes
+    return (
+        <form onSubmit={handleSubmit}>
+            <h2>{initialTask ? 'Editar Tarefa' : 'Adicionar Tarefa'}</h2>
+            <div>
+                <label htmlFor="title">Título</label>
+                <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+            </div>
+            <div>
+                <label htmlFor="description">Descrição</label>
+                <textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="dueDate">Data de Vencimento</label>
+                <input
+                    type="datetime-local"
+                    id="dueDate"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                />
+            </div>
+            <button type="submit">{initialTask ? 'Editar' : 'Adicionar'}</button>
+        </form>
+    );
+};
 
-### Configuração e Execução
+export default TaskForm;
+export {};
+content_copy
+download
+Use code with caution.
+TypeScript
 
-1.  **Backend:**
-    1.  Navegue até o diretório `backend`.
-        ```bash
-        cd backend
-        ```
-    2.  Instale as dependências.
-        ```bash
-        npm install
-        ```
-    3.  Crie um arquivo `.env` na raiz do diretório `backend` e defina as variáveis de ambiente necessárias (como as credenciais do banco de dados).
-    4.  Execute as migrations para configurar o banco de dados.
-        ```bash
-        npm run migrate
-        ```
-    5.  Inicie o servidor backend.
-        ```bash
-        npm start
-        ```
-2.  **Frontend:**
-    1.  Navegue até o diretório `task-manager-frontend`.
-        ```bash
-        cd task-manager-frontend
-        ```
-    2.  Instale as dependências.
-        ```bash
-        npm install
-        ```
-    3.  Inicie a aplicação frontend.
-        ```bash
-        npm start
-        ```
-3.  **Acesse a aplicação no seu navegador em `http://localhost:3000`.**
+Renderiza o formulário para adicionar e editar tarefas, utilizando useState para o gerenciamento dos estados dos inputs e initialTask caso a função seja editar.
 
-### Testes
+TaskItem.tsx: Componente para renderizar um item individual de tarefa.
 
-*   **Backend:**
-    1.  Navegue até o diretório `backend`.
-        ```bash
-        cd backend
-        ```
-    2.  Execute os testes unitários.
-        ```bash
-        npm test
-        ```
-*   **Frontend:**
-    1.  Navegue até o diretório `task-manager-frontend`.
-        ```bash
-        cd task-manager-frontend
-        ```
-    2.  Execute os testes unitários.
-        ```bash
-        npm test
-        ```
+import React from 'react';
 
-### Contribuições
+interface TaskItemProps {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+    dueDate: string | null;
+    onEdit: (id: number) => void;
+    onDelete: (id: number) => void;
+    onComplete: (id: number) => void;
+}
+
+const TaskItem: React.FC<TaskItemProps> = ({
+    id,
+    title,
+    description,
+    completed,
+    dueDate,
+    onEdit,
+    onDelete,
+    onComplete,
+}) => {
+    const handleComplete = () => {
+        onComplete(id);
+    };
+    const handleDelete = () => {
+        onDelete(id);
+    };
+    const handleEdit = () => {
+        onEdit(id);
+    };
+    return (
+        <li>
+            <h2>{title}</h2>
+            <p>{description}</p>
+            {dueDate ? (
+                <p>
+                    Data de Vencimento: {new Date(dueDate).toLocaleDateString()} {new Date(dueDate).toLocaleTimeString()}
+                </p>
+            ) : null}
+            <div>
+                <button onClick={handleEdit}>Editar</button>
+                <button onClick={handleDelete}>Excluir</button>
+                <button style={{ backgroundColor: completed ? 'green' : 'gray' }} onClick={handleComplete}>
+                    {completed ? 'Concluído' : 'Pendente'}
+                </button>
+            </div>
+        </li>
+    );
+};
+
+export default TaskItem;
+export {};
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Exibe os detalhes de uma tarefa, incluindo botões para editar, excluir e completar.
+
+TaskList.tsx: Componente para renderizar a lista de tarefas.
+
+import React from 'react';
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+  dueDate: string | null;
+}
+
+interface TaskListProps {
+  tasks: Task[];
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  onComplete: (id: number) => void;
+}
+
+const TaskList: React.FC<TaskListProps> = ({ tasks, onEdit, onDelete, onComplete }) => {
+  return (
+    <div className="task-list-container">
+      {tasks.map((task) => (
+        <div className="task-item" key={task.id}>
+          <h3>{task.title}</h3>
+          <p>{task.description}</p>
+          <p>Vence em: {task.dueDate || 'Sem data'}</p>
+          <button onClick={() => onEdit(task.id)}>Editar</button>
+          <button onClick={() => onDelete(task.id)}>Excluir</button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default TaskList;
+content_copy
+download
+Use code with caution.
+TypeScript
+
+Renderiza uma lista de tarefas usando o método map.
+
+Parte 5: Configuração, Execução e Testes
+Configuração e Execução
+
+Backend:
+
+Navegue até o diretório backend.
+
+cd backend
+content_copy
+download
+Use code with caution.
+Bash
+
+Instale as dependências.
+
+npm install
+content_copy
+download
+Use code with caution.
+Bash
+
+Crie um arquivo .env na raiz do diretório backend e defina as variáveis de ambiente necessárias (como as credenciais do banco de dados).
+
+Execute as migrations para configurar o banco de dados.
+
+npm run migrate
+content_copy
+download
+Use code with caution.
+Bash
+
+Inicie o servidor backend.
+
+npm start
+content_copy
+download
+Use code with caution.
+Bash
+
+Frontend:
+
+Navegue até o diretório task-manager-frontend.
+
+cd task-manager-frontend
+content_copy
+download
+Use code with caution.
+Bash
+
+Instale as dependências.
+
+npm install
+content_copy
+download
+Use code with caution.
+Bash
+
+Inicie a aplicação frontend.
+
+npm start
+content_copy
+download
+Use code with caution.
+Bash
+
+Acesse a aplicação no seu navegador em http://localhost:3000.
+
+Testes
+
+Backend:
+
+Navegue até o diretório backend.
+
+cd backend
+content_copy
+download
+Use code with caution.
+Bash
+
+Execute os testes unitários.
+
+npm test
+content_copy
+download
+Use code with caution.
+Bash
+
+Frontend:
+
+Navegue até o diretório task-manager-frontend.
+
+cd task-manager-frontend
+content_copy
+download
+Use code with caution.
+Bash
+
+Execute os testes unitários.
+
+npm test
+content_copy
+download
+Use code with caution.
+Bash
+Contribuições
 
 Contribuições são bem-vindas. Sinta-se livre para abrir issues, enviar pull requests, ou sugerir melhorias.
 
-### Licença
+Licença
 
 Este projeto é licenciado sob a MIT License.
 
-```
-
 Este README completo, dividido em 5 partes, deve facilitar a compreensão e o uso do seu projeto por outras pessoas. Cada parte cobre um aspecto diferente do projeto, desde a estrutura geral até os detalhes de cada componente. Se precisar de mais algum ajuste ou detalhe, estou à disposição!
+content_copy
+download
+Use code with caution.
