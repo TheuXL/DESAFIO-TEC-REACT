@@ -1,0 +1,11 @@
+.filter-tasks {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.filter-tasks input, .filter-tasks select, .filter-tasks button {
+  flex: 1;
+}

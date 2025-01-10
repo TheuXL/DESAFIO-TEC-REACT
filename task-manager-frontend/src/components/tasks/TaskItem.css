@@ -1,0 +1,16 @@
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--background-light);
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .task-item:hover {
+    background-color: var(--secondary-green);
+    color: var(--text-light);
+  }
+  

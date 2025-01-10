@@ -1,0 +1,14 @@
+.task-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .task-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .task-form input, .task-form textarea, .task-form button {
+    margin-bottom: 10px;
+  }
+  

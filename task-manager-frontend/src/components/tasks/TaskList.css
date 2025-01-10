@@ -1,0 +1,64 @@
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+     width: 80%;
+      margin: 0 auto; /* Centraliza a lista de tarefas na horizontal */
+
+}
+li {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+li h2{
+    color: var(--primary-blue);
+      text-align: center;
+
+}
+li div{
+   display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+li div button{
+    padding: 10px;
+    background-color: var(--secondary-green); /* Botões com cor verde */
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+li div button:hover{
+    background-color: var(--primary-green);
+}
+li div button:disabled {
+  background-color: var(--light-blue);
+    cursor: not-allowed;
+}
+.task-list-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebra de linha se o espaço horizontal não for suficiente */
+    gap: 16px; /* Espaçamento entre as tarefas */
+    justify-content: center; /* Centraliza as tarefas no contêiner */
+    margin: 20px auto; /* Adiciona margem para centralizar verticalmente */
+    padding: 10px;
+  }
+  
+  .task-item {
+    background-color: #f8f9fa; /* Cor de fundo para contraste */
+    border: 1px solid #ddd; /* Borda para destacar cada item */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para um efeito visual */
+    padding: 16px; /* Espaçamento interno */
+    width: 250px; /* Largura fixa para uniformizar as tarefas */
+    text-align: center; /* Centraliza o texto */
+  }
+  

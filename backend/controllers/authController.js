@@ -4,58 +4,69 @@ const { User } = require('../database/models'); // Certifique-se de que o caminh
 
 const { JWT_SECRET } = process.env;
 
+// Função para verificar se o email já existe
+const checkIfEmailExists = async (email) => {
+try {
+    const existingUser = await User.findOne({ where: { email } });
+    return !!existingUser; // Retorna true se o email existir, false caso contrário.
+} catch (error) {
+    console.error('Erro ao verificar email:', error);
+    return false; // Em caso de erro, retorna false para permitir que o usuário seja cadastrado e gere um erro.
+}
+};
+
 // Cadastro de usuário
 exports.signup = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    // Verificar se o e-mail já está cadastrado
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email já cadastrado.' });
+        // Verificar se o e-mail já está cadastrado
+        const emailExists = await checkIfEmailExists(email);
+        if (emailExists) {
+        return res.status(400).json({ message: 'Email já cadastrado.' });
+        }
+
+        // Criptografar a senha
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Criar novo usuário
+        const newUser = await User.create({ email, password: hashedPassword });
+
+        // Gerar token JWT
+        const token = jwt.sign({ id: newUser.id }, JWT_SECRET, { expiresIn: '1h' });
+
+        // Retornar resposta com token
+        res.status(201).json({ message: 'Cadastro realizado com sucesso.', token });
+    } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error);
+        res.status(500).json({ message: 'Erro ao cadastrar usuário.', error: error.message });
     }
-
-    // Criptografar a senha
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Criar novo usuário
-    const newUser = await User.create({ email, password: hashedPassword });
-
-    // Gerar token JWT
-    const token = jwt.sign({ id: newUser.id }, JWT_SECRET, { expiresIn: '1h' });
-
-    // Retornar resposta com token
-    res.status(201).json({ message: 'Cadastro realizado com sucesso.', token });
-  } catch (error) {
-    console.error('Erro ao cadastrar usuário:', error);
-    res.status(500).json({ message: 'Erro ao cadastrar usuário.', error: error.message });
-  }
 };
 
 // Login de usuário
 exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    // Verificar se o e-mail está cadastrado
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: 'Usuário não encontrado.' });
+        // Verificar se o e-mail está cadastrado
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+        return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        // Verificar a senha
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+        return res.status(400).json({ message: 'Senha incorreta.' });
+        }
+
+        // Gerar token JWT
+        const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+
+        // Retornar resposta com token
+        res.status(200).json({ message: 'Login bem-sucedido.', token });
+    } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        res.status(500).json({ message: 'Erro ao fazer login.', error: error.message });
     }
-
-    // Verificar a senha
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Senha incorreta.' });
-    }
-
-    // Gerar token JWT
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
-
-    // Retornar resposta com token
-    res.status(200).json({ message: 'Login bem-sucedido.', token });
-  } catch (error) {
-    console.error('Erro ao fazer login:', error);
-    res.status(500).json({ message: 'Erro ao fazer login.', error: error.message });
-  }
 };

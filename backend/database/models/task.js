@@ -12,11 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    dueDate: {
+    dueDate: {  // Adicionado campo de dueDate
       type: DataTypes.DATE,
       allowNull: true,
     },
-    userId: {  // Adicionado campo de userId
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

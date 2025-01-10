@@ -1,0 +1,35 @@
+.navbar {
+    background-color: var(--primary-blue);
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+  }
+  
+  .navbar ul li {
+    display: inline;
+  }
+  
+  .navbar ul li a{
+    color: white;
+      text-decoration: none;
+  }
+  .navbar ul li button{
+      background-color: var(--secondary-green);
+      padding: 10px;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+  }
+  
+  .navbar ul li button:hover{
+      background-color: var(--primary-green);
+      color: var(--dark-blue);
+  }

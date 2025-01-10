@@ -1,4 +1,3 @@
-// auth.js (middleware de autenticação)
 const jwt = require('jsonwebtoken');
 const { User } = require('../database/models');
 
